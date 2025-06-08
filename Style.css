@@ -1,0 +1,30 @@
+/* إعدادات أساسية لكل الصفحة */
+body {
+    background-color: #121212; /* لون الخلفية الداكن جداً */
+    color: #e0e0e0;           /* لون النص الأبيض المائل للرمادي */
+    font-family: Arial, sans-serif; /* نوع الخط */
+    margin: 0;
+    padding: 0;
+    text-align: center; /* محاذاة كل النصوص في المنتصف */
+}
+
+/* تصميم الجزء العلوي (الهيدر) */
+header {
+    background-color: #1f1f1f; /* لون أغمق قليلاً للخلفية العلوية */
+    padding: 20px;
+    border-bottom: 1px solid #333; /* خط فاصل سفلي */
+}
+
+header h1 {
+    margin: 0;
+    color: #ffffff; /* لون أبيض ناصع للعنوان الرئيسي */
+}
+
+/* تصميم المحتوى الرئيسي */
+main {
+    padding: 30px 15px; /* ترك هوامش داخلية */
+}
+
+h2 {
+    color: #bb86fc; /* لون بنفسجي مميز للعناوين الفرعية */
+}
