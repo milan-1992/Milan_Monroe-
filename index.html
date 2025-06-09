@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>الموت الرحيم</title>
+    
+    <!-- نتأكد أن اسم الملف هنا مطابق تمامًا لاسم ملف التصميم (style.css) -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -14,9 +16,26 @@
     </header>
 
     <main>
-        <h2>أهلاً بك في عالمك الموازي</h2>
+        <nav class="main-buttons">
+            <!-- تأكد من أن هذه المعرفات (id) مطابقة تمامًا لما في ملف script.js -->
+            <button id="addStoryBtn">إضافة قصة / خاطرة</button>
+            <button id="notesBtn">ملاحظاتي</button>
+            <button id="galleryBtn">معرض الصور</button>
+        </nav>
+
+        <!-- هذه هي المنطقة التي سيتغير محتواها -->
+        <div id="content-area">
+            <h2>أهلاً بك في عالمك الموازي</h2>
+            <p>اختر أحد الخيارات أعلاه للبدء.</p>
+        </div>
     </main>
 
+    <!-- 
+      نضع ملف السكريبت في نهاية الـ body.
+      هذا يضمن أن يتم تحميل كل عناصر الصفحة أولاً ثم الكود البرمجي،
+      وهو أمر مهم جدًا لتجنب الأخطاء.
+    -->
     <script src="script.js"></script>
 </body>
 </html>
+
