@@ -1,102 +1,64 @@
-// ننتظر حتى يتم تحميل جميع عناصر الصفحة بالكامل قبل تشغيل الكود
+// انتظر حتى يتم تحميل كل محتوى الصفحة بالكامل
 document.addEventListener('DOMContentLoaded', () => {
+    
+    // هذه دالة وهمية للتهيئة، لا تقم بتغييرها
+    // It's a placeholder function, don't change it
+    function initializeApp(config) {
+        // This is a mock initialization. The real initialization happens in index.html
+        // We just need a reference to the configuration.
+        // The real Firebase app instance is available globally because it was declared in a classic script in index.html.
+        return window.firebase.app.getApps().length === 0 ? window.firebase.initializeApp(config) : window.firebase.app.getApps()[0];
+    }
 
-    // --- 1. تعريف العناصر الأساسية ---
-    // نخبر جافاسكريبت بالبحث في ملف HTML عن العناصر التي سنحتاجها
-    // ونعطيها أسماء مختصرة لاستخدامها في الكود.
-    const addStoryBtn = document.getElementById('addStoryBtn');
-    const notesBtn = document.getElementById('notesBtn');
-    const galleryBtn = document.getElementById('galleryBtn');
-    const contentArea = document.getElementById('content-area');
+    // هنا نقوم بوضع نفس معلومات الإعداد الموجودة في ملف index.html
+    // لا تقلق، هذا التكرار ضروري لكي يتمكن هذا الملف من التعرف على مشروعك
+    const firebaseConfig = {
+        apiKey: "AIzaSyCCRMDWzy226sLgEOiRUk6ak9gP8PpZOqk",
+        authDomain: "milan-monroe-diary.firebaseapp.com",
+        projectId: "milan-monroe-diary",
+        storageBucket: "milan-monroe-diary.firebasestorage.app",
+        messagingSenderId: "395222582236",
+        appId: "1:395222582236:web:1662225e111de7d2f64519"
+        // measurementId is optional
+    };
 
-    // --- 2. إضافة وظيفة لزر "إضافة قصة / خاطرة" ---
-    // هنا نقول: "عندما يتم الضغط على الزر addStoryBtn، قم بتنفيذ الكود التالي"
-    addStoryBtn.addEventListener('click', () => {
-        // نعرض نموذج كتابة القصة في منطقة المحتوى
-        showStoryForm();
-    });
+    // نقوم بتهيئة تطبيق Firebase وقاعدة البيانات
+    const app = initializeApp(firebaseConfig);
+    const db = window.firebase.firestore.getFirestore(app);
 
-    /**
-     * دالة لعرض نموذج إدخال القصة
-     */
-    function showStoryForm() {
-        // أولاً، نقوم بتفريغ منطقة المحتوى من أي شيء موجود بداخلها
-        contentArea.innerHTML = '';
+    // --- الجزء الخاص بحفظ البيانات ---
 
-        // ثانياً، نجهز كود HTML جديد يحتوي على مربع نص وزر للحفظ
-        const storyFormHTML = `
-            <div class="form-container">
-                <h2>اكتب قصتك أو خاطرتك</h2>
-                <textarea id="storyTextarea" rows="12" placeholder="ابدأ الكتابة هنا..."></textarea>
-                <button id="saveStoryBtn" class="action-button">حفظ القصة</button>
-                <div id="message-box" class="message-box hidden"></div>
-            </div>
-        `;
+    // نحصل على عناصر الصفحة التي سنتعامل معها
+    const storyInput = document.getElementById('storyInput');
+    const saveStoryBtn = document.getElementById('saveStoryBtn');
 
-        // ثالثاً، نضع الكود الجديد الذي جهزناه داخل منطقة المحتوى
-        contentArea.innerHTML = storyFormHTML;
+    // نتأكد أن الزر ومربع النص موجودان قبل إضافة أي أوامر
+    if (saveStoryBtn && storyInput) {
+        // نضيف مُستمع لضغطة الزر
+        saveStoryBtn.addEventListener('click', async () => {
+            const storyText = storyInput.value.trim(); // نأخذ النص من المربع ونحذف المسافات الزائدة
 
-        // رابعاً، بعد أن ظهر النموذج، نبحث الآن عن عناصره الجديدة
-        const saveStoryBtn = document.getElementById('saveStoryBtn');
-        const storyTextarea = document.getElementById('storyTextarea');
+            // نتأكد أن المستخدم كتب شيئًا
+            if (storyText === "") {
+                alert("الرجاء كتابة شيء قبل الحفظ.");
+                return; // نوقف التنفيذ
+            }
 
-        // خامساً، نضيف وظيفة لزر الحفظ الجديد
-        saveStoryBtn.addEventListener('click', () => {
-            const storyText = storyTextarea.value;
-            saveStory(storyText);
+            try {
+                // نحاول إضافة "مستند" جديد إلى "مجموعة" اسمها stories
+                const docRef = await window.firebase.firestore.addDoc(window.firebase.firestore.collection(db, "stories"), {
+                    text: storyText,
+                    createdAt: window.firebase.firestore.serverTimestamp() // يسجل تاريخ ووقت الإضافة تلقائيًا
+                });
+                
+                alert("تم حفظ القصة بنجاح!");
+                storyInput.value = ""; // نفرّغ مربع النص بعد الحفظ
+
+            } catch (error) {
+                console.error("حدث خطأ أثناء حفظ القصة: ", error);
+                alert("عذرًا، حدث خطأ ما أثناء محاولة الحفظ. الرجاء المحاولة مرة أخرى.");
+            }
         });
     }
-
-    /**
-     * دالة لحفظ وعرض القصة
-     * @param {string} text - النص الذي كتبه المستخدم
-     */
-    function saveStory(text) {
-        // نتأكد أن المستخدم كتب شيئاً
-        if (text.trim() === '') {
-            // استخدام صندوق رسائل مخصص بدلاً من alert
-            const messageBox = document.getElementById('message-box');
-            messageBox.textContent = 'لا يمكنك حفظ قصة فارغة!';
-            messageBox.classList.remove('hidden');
-            // إخفاء الرسالة بعد 3 ثوانٍ
-            setTimeout(() => {
-                messageBox.classList.add('hidden');
-            }, 3000);
-            return; // نوقف تنفيذ الكود
-        }
-
-        // نجهز كود HTML لعرض القصة المحفوظة
-        const savedStoryHTML = `
-            <div class="story-display">
-                <h3>تم حفظ خاطرتك بنجاح:</h3>
-                <p>${text.replace(/\n/g, '<br>')}</p> 
-                <button id="editStoryBtn" class="action-button">تعديل</button>
-            </div>
-        `;
-
-        // نعرض القصة المحفوظة في منطقة المحتوى
-        contentArea.innerHTML = savedStoryHTML;
-
-        // نضيف وظيفة لزر التعديل الجديد
-        const editStoryBtn = document.getElementById('editStoryBtn');
-        editStoryBtn.addEventListener('click', () => {
-            // عند الضغط على تعديل، نعيد عرض النموذج مع النص القديم
-            editStory(text);
-        });
-    }
-
-    /**
-     * دالة لتعديل قصة موجودة
-     * @param {string} existingText - النص الحالي للقصة
-     */
-    function editStory(existingText) {
-        showStoryForm(); // نعيد عرض النموذج أولاً
-        // نضع النص القديم في مربع النص ليتم تعديله
-        document.getElementById('storyTextarea').value = existingText;
-    }
-
-    // رسالة للتأكيد أن الملف يعمل (يمكنك رؤيتها في أدوات المطورين بالمتصفح)
-    console.log("ملف جافاسكريبت يعمل وجاهز للتفاعل!");
-
 });
 
